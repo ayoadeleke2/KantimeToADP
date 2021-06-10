@@ -9,12 +9,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.HomeController">
+<AnchorPane id="AnchorPane" prefHeight="335.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.HomeController">
    <children>
-      <Button fx:id="enter" layoutX="407.0" layoutY="346.0" mnemonicParsing="false" onAction="#writeIntoSheet" text="Convert" />
-      <TextField fx:id="filePath" layoutX="33.0" layoutY="269.0" prefHeight="31.0" prefWidth="410.0" />
-      <Button layoutX="467.0" layoutY="269.0" mnemonicParsing="false" onAction="#chooseFile" prefHeight="31.0" prefWidth="102.0" text="Search Directory" />
-      <TextField fx:id="sickTime" disable="true" layoutX="68.0" layoutY="127.0" prefHeight="31.0" prefWidth="78.0" promptText="Sick TIme" text="15.49">
+      <TextField fx:id="filePath" layoutX="40.0" layoutY="233.0" prefHeight="31.0" prefWidth="410.0" />
+      <Button layoutX="475.0" layoutY="233.0" mnemonicParsing="false" onAction="#chooseFile" prefHeight="31.0" prefWidth="102.0" text="Search Directory" />
+      <TextField fx:id="sickTime" disable="true" layoutX="68.0" layoutY="127.0" prefHeight="31.0" prefWidth="78.0" promptText="Sick TIme" text="1.00">
          <tooltip>
             <Tooltip text="Enter in Sick Time Pay Rate " />
          </tooltip>
@@ -33,7 +32,7 @@
             </DatePicker>
          </children>
       </HBox>
-      <Button layoutX="506.0" layoutY="346.0" mnemonicParsing="false" onAction="#newWindow" text="review" />
+      <Button layoutX="510.0" layoutY="283.0" mnemonicParsing="false" onAction="#newWindow" text="Review" />
       <CheckBox fx:id="stCheck" layoutX="174.0" layoutY="132.0" mnemonicParsing="false" onAction="#toggleSickTime" selected="true" text="Toggle Sick Time" />
    </children>
 </AnchorPane>

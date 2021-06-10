@@ -7,6 +7,7 @@ package Controller;
 
 import Data.Employee;
 import View.ExcelConversion;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -39,7 +40,7 @@ public class ReviewEmployeeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) { 
         // TODO
-            for(Employee emp : View.ExcelConversion.empList)
+        for(Employee emp : View.ExcelConversion.empList)
             empTable.add(emp);
         
         javafx.scene.control.TableColumn<Employee, Integer> idColumn = new javafx.scene.control.TableColumn<>("ID");
@@ -76,6 +77,8 @@ public class ReviewEmployeeController implements Initializable {
             ExcelConversion.empList.clear();
         });
     }    
-    
-    
+    public void download() throws IOException{
+        ExcelConversion.stage.close();
+        HomeController.primaryStage2.close();
+    }
 }
