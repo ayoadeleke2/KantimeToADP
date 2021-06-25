@@ -6,8 +6,7 @@
 package Controller;
 
 import View.ExcelConversion;
-import Data.Employee;
-import static View.ExcelConversion.scene;
+import Data.PayrollSheet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -33,7 +32,6 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import static View.ExcelConversion.kantimeWkbook;
 
 /**
  * FXML Controller class
@@ -42,6 +40,7 @@ import static View.ExcelConversion.kantimeWkbook;
  */
 public class HomeController implements Initializable {
     //static String path = ".\\Excelsheet\\ADP.xlsx";
+    XSSFWorkbook kantimeWkbook;
     XSSFWorkbook wkbook = new XSSFWorkbook();
     XSSFSheet sheet = wkbook.createSheet("ADP");
     public static FileOutputStream outputStream;
@@ -65,17 +64,17 @@ public class HomeController implements Initializable {
     }    
     
     public void convertKantimeSheet(){
-        Employee emp;
+        PayrollSheet emp;
         int rows, col;
         
         //this is the same as the line above but allows you to pick the sheet by index number
-        ExcelConversion.sheet1 = ExcelConversion.kantimeWkbook.getSheetAt(0);
+        ExcelConversion.sheet1 = kantimeWkbook.getSheetAt(0);
         //XSSFSheet sheet = wkbook.getSheet("Sheet1");
         rows = ExcelConversion.sheet1.getLastRowNum();
         //retrieve the number of columns in a given row
         col = ExcelConversion.sheet1.getRow(0).getLastCellNum();
         for(int i=1; i <= rows; i++){
-            emp = new Employee();
+            emp = new PayrollSheet();
             //gets the first row of the excel sheet
             XSSFRow row = ExcelConversion.sheet1.getRow(i);
             for(int j=0; j<col; j++){
@@ -108,7 +107,7 @@ public class HomeController implements Initializable {
                         break;
                 }
             }
-            ExcelConversion.empList.add(emp);
+            ExcelConversion.empSheetList.add(emp);
         }
     }
     
@@ -124,7 +123,7 @@ public class HomeController implements Initializable {
         String home = System.getProperty("user.home");
         File file = new File(home+"/Downloads/ADP.xlsx");
         outputStream = new FileOutputStream(file);
-        for(int row=0; row<ExcelConversion.empList.size()+requiredInfo.length;row++){ 
+        for(int row=0; row<ExcelConversion.empSheetList.size()+requiredInfo.length;row++){ 
             XSSFRow newRow = sheet.createRow(row);
             for(int col=0; col<11; col++){  
                 XSSFCell newCell = newRow.createCell(col);
@@ -144,26 +143,26 @@ public class HomeController implements Initializable {
                                 break;
                             case 3:  newCell.setCellValue((String)(endDate.getValue().format(DateTimeFormatter.ofPattern("M/d/yyyy"))));
                                 break;    
-                            case 4: newCell.setCellValue((Integer)ExcelConversion.empList.get(row-requiredInfo.length).getID());
+                            case 4: newCell.setCellValue((Integer)ExcelConversion.empSheetList.get(row-requiredInfo.length).getID());
                                 break;
-                            case 5: if(ExcelConversion.empList.get(row-requiredInfo.length).getPayRate()==Double.valueOf(sickTime.getText())){
+                            case 5: if(ExcelConversion.empSheetList.get(row-requiredInfo.length).getPayRate()==Double.valueOf(sickTime.getText())){
                                         newCell.setCellValue((String)"SPY");
-                                        ExcelConversion.empList.get(row-requiredInfo.length).setEarningsCode("SPY");
+                                        ExcelConversion.empSheetList.get(row-requiredInfo.length).setEarningsCode("SPY");
                             /*          ExcelConversion.empList.get(row-2).getRegHours()/*
                                         write code to change value back to normal sick time pay rate
                                         */
                                     }
-                                    else if(ExcelConversion.empList.get(row-2).getOtHours()==0){
+                                    else if(ExcelConversion.empSheetList.get(row-2).getOtHours()==0){
                                         newCell.setCellValue((String)"REG");
-                                        ExcelConversion.empList.get(row-requiredInfo.length).setEarningsCode("REG");}
+                                        ExcelConversion.empSheetList.get(row-requiredInfo.length).setEarningsCode("REG");}
                                     else{
                                         newCell.setCellValue((String)"OVT");
-                                        ExcelConversion.empList.get(row-requiredInfo.length).setEarningsCode("OVT");}
+                                        ExcelConversion.empSheetList.get(row-requiredInfo.length).setEarningsCode("OVT");}
                                 break;
-                            case 6: if(ExcelConversion.empList.get(row-2).getRegHours()!=0)
-                                        newCell.setCellValue((Double)ExcelConversion.empList.get(row-2).getRegHours());
+                            case 6: if(ExcelConversion.empSheetList.get(row-2).getRegHours()!=0)
+                                        newCell.setCellValue((Double)ExcelConversion.empSheetList.get(row-2).getRegHours());
                                     else
-                                    newCell.setCellValue((Double)ExcelConversion.empList.get(row-2).getOtHours());
+                                    newCell.setCellValue((Double)ExcelConversion.empSheetList.get(row-2).getOtHours());
                                 break;    
                             case 8: newCell.setCellValue((int)0);
                                 break;
@@ -177,13 +176,14 @@ public class HomeController implements Initializable {
     }    
     
     public void chooseFile() throws IOException, InvalidFormatException{
+        
      
     FileChooser fileChooser = new FileChooser();
     FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("excel files (*.xlsx)", "*xlsx");
     fileChooser.getExtensionFilters().add(extFilter);
     File retrieve = fileChooser.showOpenDialog(ExcelConversion.stage);
     filePath.setText(retrieve.getPath());
-    ExcelConversion.kantimeWkbook = new XSSFWorkbook(retrieve);       
+    kantimeWkbook = new XSSFWorkbook(retrieve);       
     }
     
     public void newWindow() throws IOException{
@@ -193,9 +193,22 @@ public class HomeController implements Initializable {
         mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/reviewEmployee.fxml"));
             reviewScene = new Scene(mainMenuFXML);
             primaryStage2.setScene(reviewScene);
-            primaryStage2.setTitle("Batch #"+ExcelConversion.empList.get(ExcelConversion.empList.size()-1).getBatchID());
+            primaryStage2.setTitle("Batch #"+ExcelConversion.empSheetList.get(ExcelConversion.empSheetList.size()-1).getBatchID());
             primaryStage2.showAndWait();
             filePath.clear();
+    }
+    
+    public void changeToEmployeeProfile() throws IOException{
+        Parent mainMenuFXML;
+
+        mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/EmployeeProfiles.fxml"));
+        System.out.println("1");
+            reviewScene = new Scene(mainMenuFXML);
+            System.out.println("2");
+            primaryStage2.setScene(reviewScene);
+            System.out.println("3");
+            primaryStage2.show();
+            System.out.println("4");
     }
     
     public void toggleSickTime(){

@@ -9,7 +9,7 @@ import View.ExcelConversion;
  *
  * @author maple
  */
-public class Employee {
+public class PayrollSheet {
     private int ID;
     private double regHours;
     private String coCode;
@@ -18,7 +18,7 @@ public class Employee {
     private String earningsCode;
     private int batchID;
     
-    Employee(int ID, double regHours, String coCode, double OtHours, double payRate){
+    PayrollSheet(int ID, double regHours, String coCode, double OtHours, double payRate){
         this.ID = ID;
         this.regHours = regHours;
         this.coCode = coCode;
@@ -26,7 +26,7 @@ public class Employee {
         this.payRate = payRate;
     }
 
-    public Employee() {
+    public PayrollSheet() {
     }
 
     /**
@@ -126,6 +126,4 @@ public class Employee {
     public void setBatchID(int batchID) {
         this.batchID = batchID;
     }
-    
-    
 }

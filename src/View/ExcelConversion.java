@@ -7,7 +7,8 @@ package View;
 
 //import static com.sun.org.apache.bcel.internal.generic.Type.STRING;
 import Controller.HomeController;
-import Data.Employee;
+import Data.Employees;
+import Data.PayrollSheet;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,46 +44,32 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author maple
  */
 public class ExcelConversion extends Application {
-        public static File retrieve;
-        public static String fileName = ".\\Excelsheet\\payroll-tst-kuns1.xlsx";
-        public static File fInput = new File(fileName); 
-        public static XSSFWorkbook kantimeWkbook;
+
+        public static Employees emp = new Employees();
+        public static ArrayList<Employees> empList = new ArrayList<>();
         public static XSSFSheet sheet1;
-        public static int rows;
-        public static int col;
-        public static Employee emp;
-        public static ArrayList<Employee> empList = new ArrayList<>();
-        public static Scene scene;
+        public static PayrollSheet empSheet;
+        public static ArrayList<PayrollSheet> empSheetList = new ArrayList<>();
+        public Scene scene;
         public static Stage stage = new Stage();
-        Scanner scan = new Scanner(System.in);
         
         
         
     @Override
     public void start(Stage primaryStage) throws IOException, InvalidFormatException{
         
-        
-        //for(int i=0;i<empList.size();i++)
-          //  System.out.println(ExcelConversion.empList.get(i).getRegHours());
             stage = primaryStage;
             Parent mainMenuFXML;
             mainMenuFXML = FXMLLoader.load(getClass().getResource("home.fxml"));
             scene = new Scene(mainMenuFXML);
             stage.setScene(scene);
-        /*
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        */
+
         stage.setTitle("HomeWatch CareGiver xlsx Conversion");
         stage.show();
-        //String date1 = startDate.getPromptText();
-        //String date2 = endDate.getPromptText();
-        //writeExcel.writeIntoSheet(date1,date2);
         stage.setOnCloseRequest((event) -> {
                 try {
-                    if(!empList.isEmpty())
+                    if(!empSheetList.isEmpty())
                         HomeController.outputStream.close();
-                        System.out.println("closed");
                 } catch (IOException ex) {
                     Logger.getLogger(ExcelConversion.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -94,9 +81,5 @@ public class ExcelConversion extends Application {
      */
     public static void main(String[] args) {
         launch(args);
-    }
-    
-    public void writeReplace() throws IOException, InvalidFormatException{
-        
     }
 }

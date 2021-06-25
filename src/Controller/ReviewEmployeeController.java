@@ -5,11 +5,14 @@
  */
 package Controller;
 
-import Data.Employee;
+import Data.Employees;
+import Data.PayrollSheet;
 import View.ExcelConversion;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
@@ -29,7 +32,7 @@ import javax.swing.table.TableColumn;
  */
 public class ReviewEmployeeController implements Initializable {
 
-    static ObservableList<Employee> empTable = FXCollections.observableArrayList();
+    static ObservableList<PayrollSheet> empTable = FXCollections.observableArrayList();
     TableView table;
     @FXML
     VBox vbox = new VBox();
@@ -40,30 +43,30 @@ public class ReviewEmployeeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) { 
         // TODO
-        for(Employee emp : View.ExcelConversion.empList)
+        for(PayrollSheet emp : View.ExcelConversion.empSheetList)
             empTable.add(emp);
         
-        javafx.scene.control.TableColumn<Employee, Integer> idColumn = new javafx.scene.control.TableColumn<>("ID");
+        javafx.scene.control.TableColumn<PayrollSheet, Integer> idColumn = new javafx.scene.control.TableColumn<>("ID");
         idColumn.setPrefWidth(75);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
         
-        javafx.scene.control.TableColumn<Employee, Double> regHoursColumn = new javafx.scene.control.TableColumn<>("Regular Hours");
+        javafx.scene.control.TableColumn<PayrollSheet, Double> regHoursColumn = new javafx.scene.control.TableColumn<>("Regular Hours");
         regHoursColumn.setPrefWidth(150);
         regHoursColumn.setCellValueFactory(new PropertyValueFactory<>("regHours"));
         
-        javafx.scene.control.TableColumn<Employee, String> coCodeColumn = new javafx.scene.control.TableColumn<>("Company Code");
+        javafx.scene.control.TableColumn<PayrollSheet, String> coCodeColumn = new javafx.scene.control.TableColumn<>("Company Code");
         coCodeColumn.setPrefWidth(75);
         coCodeColumn.setCellValueFactory(new PropertyValueFactory<>("coCode"));
         
-        javafx.scene.control.TableColumn<Employee, Double> OthoursColumn = new javafx.scene.control.TableColumn<>("OverTime");
+        javafx.scene.control.TableColumn<PayrollSheet, Double> OthoursColumn = new javafx.scene.control.TableColumn<>("OverTime");
         OthoursColumn.setPrefWidth(75);
         OthoursColumn.setCellValueFactory(new PropertyValueFactory<>("OtHours"));
         
-        javafx.scene.control.TableColumn<Employee, Double> PayRateColumn = new javafx.scene.control.TableColumn<>("Pay Rate");
+        javafx.scene.control.TableColumn<PayrollSheet, Double> PayRateColumn = new javafx.scene.control.TableColumn<>("Pay Rate");
         PayRateColumn.setPrefWidth(75);
         PayRateColumn.setCellValueFactory(new PropertyValueFactory<>("PayRate"));
         
-        javafx.scene.control.TableColumn<Employee, String> earingsCodeColumn = new javafx.scene.control.TableColumn<>("Earnings Code");
+        javafx.scene.control.TableColumn<PayrollSheet, String> earingsCodeColumn = new javafx.scene.control.TableColumn<>("Earnings Code");
         earingsCodeColumn.setPrefWidth(75);
         earingsCodeColumn.setCellValueFactory(new PropertyValueFactory<>("earningsCode"));
         
@@ -74,9 +77,15 @@ public class ReviewEmployeeController implements Initializable {
         
         HomeController.primaryStage2.setOnCloseRequest(event ->{
             empTable.clear();
-            ExcelConversion.empList.clear();
+            ExcelConversion.empSheetList.clear();
+            try {
+                HomeController.outputStream.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ReviewEmployeeController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }    
+    
     public void download() throws IOException{
         ExcelConversion.stage.close();
         HomeController.primaryStage2.close();
