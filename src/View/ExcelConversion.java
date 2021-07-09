@@ -8,7 +8,9 @@ package View;
 //import static com.sun.org.apache.bcel.internal.generic.Type.STRING;
 import Controller.HomeController;
 import Data.Employees;
+import Data.JSONEmployeesFactory;
 import Data.PayrollSheet;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,10 +48,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExcelConversion extends Application {
 
         public static Employees emp = new Employees();
-        public static ArrayList<Employees> empList = new ArrayList<>();
-        public static XSSFSheet sheet1;
+        public static ArrayList<Employees> empList;
         public static PayrollSheet empSheet;
         public static ArrayList<PayrollSheet> empSheetList = new ArrayList<>();
+        public JSONEmployeesFactory json = new JSONEmployeesFactory();
         public Scene scene;
         public static Stage stage = new Stage();
         
@@ -57,7 +59,8 @@ public class ExcelConversion extends Application {
         
     @Override
     public void start(Stage primaryStage) throws IOException, InvalidFormatException{
-        
+    
+            empList = new ArrayList(json.getEmployeeList());
             stage = primaryStage;
             Parent mainMenuFXML;
             mainMenuFXML = FXMLLoader.load(getClass().getResource("home.fxml"));
@@ -69,8 +72,8 @@ public class ExcelConversion extends Application {
         stage.setOnCloseRequest((event) -> {
                 try {
                     if(!empSheetList.isEmpty())
-                        HomeController.outputStream.close();
-                } catch (IOException ex) {
+                        HomeController.outputStream.close();}
+                catch (IOException ex) {
                     Logger.getLogger(ExcelConversion.class.getName()).log(Level.SEVERE, null, ex);
                 }
         });

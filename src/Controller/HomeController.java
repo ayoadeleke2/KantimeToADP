@@ -13,7 +13,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -29,6 +33,7 @@ import javafx.stage.StageStyle;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFChartSheet;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -40,12 +45,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class HomeController implements Initializable {
     //static String path = ".\\Excelsheet\\ADP.xlsx";
+    ArrayList<PayrollSheet> empSheetList = new ArrayList<>();
     XSSFWorkbook kantimeWkbook;
     XSSFWorkbook wkbook = new XSSFWorkbook();
     XSSFSheet sheet = wkbook.createSheet("ADP");
     public static FileOutputStream outputStream;
 
-    public static Stage primaryStage2 = new Stage();
+    public static Stage primaryStage2;
     public static Scene reviewScene;
     @FXML
     TextField sickTime, filePath;
@@ -66,17 +72,17 @@ public class HomeController implements Initializable {
     public void convertKantimeSheet(){
         PayrollSheet emp;
         int rows, col;
-        
+        XSSFSheet sheet1;
         //this is the same as the line above but allows you to pick the sheet by index number
-        ExcelConversion.sheet1 = kantimeWkbook.getSheetAt(0);
+        sheet1 = kantimeWkbook.getSheetAt(0);
         //XSSFSheet sheet = wkbook.getSheet("Sheet1");
-        rows = ExcelConversion.sheet1.getLastRowNum();
+        rows = sheet1.getLastRowNum();
         //retrieve the number of columns in a given row
-        col = ExcelConversion.sheet1.getRow(0).getLastCellNum();
+        col = sheet1.getRow(0).getLastCellNum();
         for(int i=1; i <= rows; i++){
             emp = new PayrollSheet();
             //gets the first row of the excel sheet
-            XSSFRow row = ExcelConversion.sheet1.getRow(i);
+            XSSFRow row = sheet1.getRow(i);
             for(int j=0; j<col; j++){
                 //this gets each cell from the row
                 XSSFCell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
@@ -177,28 +183,43 @@ public class HomeController implements Initializable {
     
     public void chooseFile() throws IOException, InvalidFormatException{
         
-     
+    filePath.textProperty().addListener((a,oldtxt,newtxt)->{ 
+        newWindow();
+        System.out.println("old "+oldtxt);
+        System.out.println("new "+newtxt);
+        System.out.println("e "+a);
+    });    
+    System.out.println("here1");
     FileChooser fileChooser = new FileChooser();
     FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("excel files (*.xlsx)", "*xlsx");
     fileChooser.getExtensionFilters().add(extFilter);
     File retrieve = fileChooser.showOpenDialog(ExcelConversion.stage);
+    kantimeWkbook = new XSSFWorkbook(retrieve);
     filePath.setText(retrieve.getPath());
-    kantimeWkbook = new XSSFWorkbook(retrieve);       
+    System.out.println("here2");
     }
     
-    public void newWindow() throws IOException{
-        writeIntoSheet();
-        Parent mainMenuFXML;
+    public void newWindow(){
+        
 
-        mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/reviewEmployee.fxml"));
+        try {
+            primaryStage2= new Stage();
+            System.out.println("counting");
+            writeIntoSheet();
+            Parent mainMenuFXML;
+            mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/reviewEmployee.fxml"));
             reviewScene = new Scene(mainMenuFXML);
             primaryStage2.setScene(reviewScene);
             primaryStage2.setTitle("Batch #"+ExcelConversion.empSheetList.get(ExcelConversion.empSheetList.size()-1).getBatchID());
-            primaryStage2.showAndWait();
-            filePath.clear();
+            primaryStage2.show();
+            //filePath.clear();
+        } catch (IOException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }            
     }
     
     public void changeToEmployeeProfile() throws IOException{
+        primaryStage2= new Stage();
         Parent mainMenuFXML;
 
         mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/EmployeeProfiles.fxml"));

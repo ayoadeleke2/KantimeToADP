@@ -17,6 +17,8 @@ public class Employees extends PayrollSheet{
     private double paidTimeOff;
     private double totalHoursWorked;
     private double sickTimeAccrued;
+    private double payPeriodHours;
+    private int yearsEmployed;
 
     public Employees() {
     }
@@ -140,9 +142,7 @@ public class Employees extends PayrollSheet{
                 return 40;
             }
             return sickTimeAccrued;
-            
-        }
-        
+        }        
         return sickTimeAccrued;
     }
 }

@@ -32,7 +32,7 @@ import javax.swing.table.TableColumn;
  */
 public class ReviewEmployeeController implements Initializable {
 
-    static ObservableList<PayrollSheet> empTable = FXCollections.observableArrayList();
+    ObservableList<PayrollSheet> empTable = FXCollections.observableArrayList();
     TableView table;
     @FXML
     VBox vbox = new VBox();
@@ -77,6 +77,7 @@ public class ReviewEmployeeController implements Initializable {
         
         HomeController.primaryStage2.setOnCloseRequest(event ->{
             empTable.clear();
+            table.getItems().clear();
             ExcelConversion.empSheetList.clear();
             try {
                 HomeController.outputStream.close();
