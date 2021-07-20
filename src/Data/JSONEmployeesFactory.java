@@ -7,7 +7,9 @@ package Data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,15 @@ public class JSONEmployeesFactory {
         File jsonFile = new File("Employees.json");
         ArrayList employees = null;
         try {
-            employees = mapper.readValue(jsonFile, new TypeReference<ArrayList<Employees>>() {
+            if(jsonFile.exists()!=true){
+                jsonFile.createNewFile();
+                if(jsonFile.length()==0){
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(jsonFile));
+                    bw.write("[{}]");
+                    bw.close();
+                }
+            }
+                employees = mapper.readValue(jsonFile, new TypeReference<ArrayList<Employees>>() {
             });
         } catch (IOException ex) {
             Logger.getLogger(JSONEmployeesFactory.class.getName()).log(Level.SEVERE, null, ex);

@@ -7,6 +7,7 @@ package Controller;
 
 import Data.Employees;
 import Data.PayrollSheet;
+import Data.PayrollSheetTableViewFactory;
 import View.ExcelConversion;
 import java.io.IOException;
 import java.net.URL;
@@ -46,33 +47,9 @@ public class ReviewEmployeeController implements Initializable {
         for(PayrollSheet emp : View.ExcelConversion.empSheetList)
             empTable.add(emp);
         
-        javafx.scene.control.TableColumn<PayrollSheet, Integer> idColumn = new javafx.scene.control.TableColumn<>("ID");
-        idColumn.setPrefWidth(75);
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        
-        javafx.scene.control.TableColumn<PayrollSheet, Double> regHoursColumn = new javafx.scene.control.TableColumn<>("Regular Hours");
-        regHoursColumn.setPrefWidth(150);
-        regHoursColumn.setCellValueFactory(new PropertyValueFactory<>("regHours"));
-        
-        javafx.scene.control.TableColumn<PayrollSheet, String> coCodeColumn = new javafx.scene.control.TableColumn<>("Company Code");
-        coCodeColumn.setPrefWidth(75);
-        coCodeColumn.setCellValueFactory(new PropertyValueFactory<>("coCode"));
-        
-        javafx.scene.control.TableColumn<PayrollSheet, Double> OthoursColumn = new javafx.scene.control.TableColumn<>("OverTime");
-        OthoursColumn.setPrefWidth(75);
-        OthoursColumn.setCellValueFactory(new PropertyValueFactory<>("OtHours"));
-        
-        javafx.scene.control.TableColumn<PayrollSheet, Double> PayRateColumn = new javafx.scene.control.TableColumn<>("Pay Rate");
-        PayRateColumn.setPrefWidth(75);
-        PayRateColumn.setCellValueFactory(new PropertyValueFactory<>("PayRate"));
-        
-        javafx.scene.control.TableColumn<PayrollSheet, String> earingsCodeColumn = new javafx.scene.control.TableColumn<>("Earnings Code");
-        earingsCodeColumn.setPrefWidth(75);
-        earingsCodeColumn.setCellValueFactory(new PropertyValueFactory<>("earningsCode"));
-        
         table = new TableView<>();
         table.setItems(empTable);
-        table.getColumns().addAll(idColumn,regHoursColumn,coCodeColumn,OthoursColumn,PayRateColumn,earingsCodeColumn);
+        table.getColumns().addAll(PayrollSheetTableViewFactory.getColumns());
         vbox.getChildren().add(table);    
         
         HomeController.primaryStage2.setOnCloseRequest(event ->{

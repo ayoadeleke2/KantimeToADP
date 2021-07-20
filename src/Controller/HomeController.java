@@ -185,18 +185,14 @@ public class HomeController implements Initializable {
         
     filePath.textProperty().addListener((a,oldtxt,newtxt)->{ 
         newWindow();
-        System.out.println("old "+oldtxt);
-        System.out.println("new "+newtxt);
-        System.out.println("e "+a);
     });    
-    System.out.println("here1");
+    
     FileChooser fileChooser = new FileChooser();
     FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("excel files (*.xlsx)", "*xlsx");
     fileChooser.getExtensionFilters().add(extFilter);
     File retrieve = fileChooser.showOpenDialog(ExcelConversion.stage);
     kantimeWkbook = new XSSFWorkbook(retrieve);
     filePath.setText(retrieve.getPath());
-    System.out.println("here2");
     }
     
     public void newWindow(){
@@ -212,7 +208,6 @@ public class HomeController implements Initializable {
             primaryStage2.setScene(reviewScene);
             primaryStage2.setTitle("Batch #"+ExcelConversion.empSheetList.get(ExcelConversion.empSheetList.size()-1).getBatchID());
             primaryStage2.show();
-            //filePath.clear();
         } catch (IOException ex) {
             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
         }            
@@ -223,13 +218,9 @@ public class HomeController implements Initializable {
         Parent mainMenuFXML;
 
         mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/EmployeeProfiles.fxml"));
-        System.out.println("1");
             reviewScene = new Scene(mainMenuFXML);
-            System.out.println("2");
             primaryStage2.setScene(reviewScene);
-            System.out.println("3");
             primaryStage2.show();
-            System.out.println("4");
     }
     
     public void toggleSickTime(){

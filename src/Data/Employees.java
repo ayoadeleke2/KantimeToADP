@@ -19,6 +19,7 @@ public class Employees extends PayrollSheet{
     private double sickTimeAccrued;
     private double payPeriodHours;
     private int yearsEmployed;
+    private int IDs;
 
     public Employees() {
     }
@@ -144,5 +145,19 @@ public class Employees extends PayrollSheet{
             return sickTimeAccrued;
         }        
         return sickTimeAccrued;
+    }
+
+    /**
+     * @return the ID
+     */
+    public int getIDs() {
+        return IDs;
+    }
+
+    /**
+     * @param IDs the ID to set
+     */
+    public void setIDs(int ID) {
+        this.IDs = ID;
     }
 }

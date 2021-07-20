@@ -16,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +56,17 @@ import tray.animations.AnimationType;
 import tray.notification.NotificationType;
 import tray.notification.TrayNotification;
 import Data.EmployeeTableViewFactory;
+import Data.PayrollSheetTableViewFactory;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.HBox;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * FXML Controller class
@@ -65,13 +75,16 @@ import Data.EmployeeTableViewFactory;
  */
 public class EmployeeProfilesController implements Initializable {
 
-    
+    public File ADPfile;
     public Employees employee;
+    ArrayList<PayrollSheet> IDlist = new ArrayList<>();
     ObservableList<PayrollSheet> empTable = FXCollections.observableArrayList();
     ObservableList<Employees> li = FXCollections.observableArrayList();
     TableView table;
     @FXML
-    VBox vbox;
+    VBox vbox,vbox2;
+    @FXML
+    HBox hbox;
     @FXML
     TextField name,OT,VT,PTO,ST,hours, mins;
     boolean updated= false;
@@ -80,7 +93,9 @@ public class EmployeeProfilesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        PayrollSheet PS = new PayrollSheet();
         
+        TableView table2 = new TableView();
         table = new TableView();
         if(ExcelConversion.empList.isEmpty()){
             
@@ -88,27 +103,28 @@ public class EmployeeProfilesController implements Initializable {
         else{ 
             table.getItems().addAll(ExcelConversion.empList);
         }
-            //table.setEditable(true);
-            table.getColumns().addAll(EmployeeTableViewFactory.getColumns());
-            table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            vbox.getChildren().add(table);   
-            BackgroundFill fills = new BackgroundFill(Color.GREENYELLOW, CornerRadii.EMPTY, Insets.EMPTY);
-            Background bg = new Background(fills);
-            table.backgroundProperty().setValue(bg);
-            //table.setStyle("-fx-selection-bar: red; -fx-selection-bar-non-focused: salmon;");
+        table2.getItems().addAll(getEmployeeIDs());
+        table2.getColumns().addAll(PayrollSheetTableViewFactory.getColumns().subList(0, 1));
+        table.getColumns().addAll(EmployeeTableViewFactory.getColumns());
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        vbox.getChildren().add(table); 
+        vbox2.getChildren().add(table2);
+        BackgroundFill fills = new BackgroundFill(new Color(0, 0, 0, 0), CornerRadii.EMPTY, Insets.EMPTY);
+        Background bg = new Background(fills);
+        table.backgroundProperty().setValue(bg);
             
-        
         table.setOnMouseClicked((MouseEvent event) -> {
                             
                 ObservableList<Employees> list = table.getSelectionModel().getSelectedCells();
                 Employees e = new Employees();
-                Employees selecteditem = /*(Employees)table.getSelectionModel().getSelectedItem();*/
-                (Employees)table.getSelectionModel().getTableView().getSelectionModel().getSelectedItem();
+                Employees selecteditem = (Employees)table.getSelectionModel().getSelectedItem();
+                int SelectedItemIndex = table.getSelectionModel().getSelectedIndex();
                 //String index = (Employees)table.getSelectionModel().getTableView().getVisibleLeafIndex(OTColumn);
-                TablePosition tp;
+                TablePosition tp, tp2;
                 tp = table.getFocusModel().getFocusedCell();
+                tp2 = table2.getFocusModel().getFocusedCell();
                 switch(tp.getColumn()){
-                    case 0:
+                    case 6:
                         System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(table.getSelectionModel().getSelectedIndex()));
                         break;
                     case 1:
@@ -126,16 +142,32 @@ public class EmployeeProfilesController implements Initializable {
                     case 5:
                         System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
                         break;
-                    case 6:
-                        //PayrollSheet.getEmployeeID(book, sheet);
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                        break;
+                    case 0:
+                        if(alert().equals(ButtonType.OK)){
+                            selecteditem.setIDs(Integer.valueOf(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()).toString()));
+                            e.setEarningsCode(selecteditem.getEarningsCode());
+                            e.setID(selecteditem.getID());
+                            e.setBatchID(selecteditem.getBatchID());
+                            e.setCoCode(selecteditem.getCoCode());
+                            e.setName(selecteditem.getName());
+                            e.setOvertime(selecteditem.getOvertime());
+                            e.setPaidTimeOff(selecteditem.getPaidTimeOff());
+                            e.setSickTimeAccrued(selecteditem.getSickTimeAccrued());
+                            e.setTotalHoursWorked(selecteditem.getTotalHoursWorked());
+                            e.setVacationTime(selecteditem.getVacationTime());
+                            e.setIDs((Integer)table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()));
+                            System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                            System.out.println(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()));
+                            ExcelConversion.empList.remove(SelectedItemIndex);
+                            ExcelConversion.empList.add(SelectedItemIndex,e);
+                            table.getItems().remove(SelectedItemIndex);
+                            table.getItems().add(SelectedItemIndex, e);
+                            table.getSelectionModel().clearSelection();
+                            table.getSelectionModel().select(SelectedItemIndex);
+                            updated=true;
+                            break;
+                        }
                 }
-                    if(event != table.getSelectionModel().getTableView().getVisibleLeafColumn(1).getCellFactory()){
-                        //System.out.println(selecteditem.getName());
-                        //System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(1).getCellData(table.getSelectionModel().getSelectedIndex()));
-                        //System.out.println(index);
-                    }
         });
     }
     
@@ -153,6 +185,7 @@ public class EmployeeProfilesController implements Initializable {
         employee.setTotalHoursWorked(totalHours);
         employee.setID(0);
         table.getItems().add(employee);   
+        ExcelConversion.empList.add(employee);
         
         name.clear();
         VT.clear();
@@ -170,19 +203,18 @@ public class EmployeeProfilesController implements Initializable {
         
         deletedEmployees = table.getSelectionModel().getSelectedItems();
         li.addAll(deletedEmployees);
-        for(Employees emp: deletedEmployees)
-            System.out.println(deletedEmployees.listIterator().hasNext());
-        if(deletedEmployees.listIterator().hasNext()){ 
+
+        if(deletedEmployees.size() > 1){
             table.getItems().removeAll(deletedEmployees);
-            empList.remove(deletedEmployees);
+            empList.removeAll(li);
             updated=true;
         }else{
             Employees selecteditem = (Employees)table.getSelectionModel().getSelectedItem();
-        
             table.getItems().remove(selecteditem);
             ExcelConversion.empList.remove(selecteditem);
-            updated=true;}        
-    }    
+            updated=true;}
+        table.getSelectionModel().clearSelection();    
+    }
     
     
     
@@ -190,9 +222,9 @@ public class EmployeeProfilesController implements Initializable {
         Employees emp = new Employees();
         double totalHours;
         
-         if(hours.getText().isEmpty()||mins.getText().isEmpty()){
+         if(hours.getText().isEmpty()||mins.getText().isEmpty())
                 totalHours = 0;
-         }else
+         else
              totalHours = (double)emp.timeToDecimal(Integer.parseInt(hours.getText()),Integer.parseInt(mins.getText()));
 
         String sicktime = String.valueOf(emp.calculateSickTime(totalHours));
@@ -200,7 +232,7 @@ public class EmployeeProfilesController implements Initializable {
     }
     
     
-    public void writeToJson(){
+    public void writeToJson() throws IOException, InvalidFormatException{
         
         String mess = "Data Sheet Updated and Saved";
         ObjectMapper mapper = new ObjectMapper();
@@ -214,41 +246,152 @@ public class EmployeeProfilesController implements Initializable {
         if(updated==true){
             updated=false;
             empList.clear();
-            ExcelConversion.empList.addAll(table.getSelectionModel().getTableView().getItems());
+            empList.addAll(table.getSelectionModel().getTableView().getItems());
+            calculateTimefromADPSheet();
+            table.getItems().clear();
+            table.getItems().addAll(ExcelConversion.empList);
             try {
                 mapper.writeValue(file, ExcelConversion.empList);
                 note.showAndDismiss(Duration.seconds(3));
             } catch (IOException ex) {
                 Logger.getLogger(EmployeeProfilesController.class.getName()).log(Level.SEVERE, null, ex);}
         }else
-            System.out.println("not updated");        
+            System.out.println("not updated");    
+        
     }
     
     public void recoverDeleted(){
         //TableView<Employees> l = new TableView<>();
         String blue = "-fx-selection-bar: blue; -fx-selection-bar-non-focused: salmon;";
         String red = "-fx-selection-bar: red; -fx-selection-bar-non-focused: salmon;";
-        TableCell<Employees,Employees> cell = new TableCell<>();
-        cell.updateTableView(table);
-        TableView<Employees> dl = new TableView<>(li);
         
-        table.getItems().addAll(dl.getItems());
-        Iterator<Employees> tableIterator = table.getItems().iterator();
+        table.getItems().addAll(li);
+        ExcelConversion.empList.addAll(li);
         
-        
-        for(int j=0;tableIterator.hasNext();j++,tableIterator.next()){
-            table.getFocusModel().focus(j);
-            Employees focusedEmp = (Employees)table.getFocusModel().getFocusedItem();
-            Iterator<Employees> dlIterator = dl.getItems().listIterator(0);
-            for(int i=0;dlIterator.hasNext();dlIterator.next(),i++){
-                //if(focusedEmp.getName().equals(dl.getItems().get(i).getName()))
-                    //table.getFocusModel().getFocusedCell().getTableView().getSelectionModel().selectIndices(table.getItems().size()-dl.getItems().size(), table.getItems().size()-1);
-            }        
-        }
         table.getFocusModel().getFocusedCell().getTableView().getSelectionModel().clearSelection();
-        table.getFocusModel().getFocusedCell().getTableView().getSelectionModel().selectRange(table.getItems().size()-dl.getItems().size(), table.getItems().size());
-        System.out.println((table.getItems().size()-dl.getItems().size())+" "+(table.getItems().size()-1));
-        //table.setStyle(red);
+        table.getFocusModel().getFocusedCell().getTableView().getSelectionModel().selectRange(table.getItems().size()-li.size(), table.getItems().size());
+        System.out.println((table.getItems().size()-li.size())+" "+(table.getItems().size()-1));
         li.clear();
+    }
+    
+    public ArrayList<PayrollSheet> getEmployeeIDs(){
+        
+        String home = System.getProperty("user.home");
+        File filepath = new File(home+"/Downloads/");
+        File[] fileList = filepath.listFiles();
+        
+        int rows, col;
+        PayrollSheet newID;
+        Employees e = new Employees();
+        ArrayList<Employees> affectedEmps = new ArrayList<>();
+        ArrayList<Integer> temp = new ArrayList();
+        XSSFSheet sheet = null;
+        XSSFWorkbook book = null;
+        
+        
+        if(fileList!=null){
+            for(File f: fileList){
+                if(f.getName().equals("ADP.xlsx")){ 
+                    try {
+                        ADPfile = f;
+                        book = new XSSFWorkbook(f);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PayrollSheet.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvalidFormatException ex) {
+                        Logger.getLogger(PayrollSheet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        
+        sheet = book.getSheetAt(0);
+        rows = sheet.getLastRowNum();
+        col = sheet.getRow(0).getLastCellNum();
+        int flag =0;
+                
+                for(int i=1; i <= rows; i++){
+                XSSFRow row = sheet.getRow(i);
+                    for(int j=0; j<col; j++){
+                    XSSFCell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                        if(i>1 && j==4){
+                            int value = (int)cell.getNumericCellValue();
+                            if(temp.contains(value)==false){
+                                newID = new PayrollSheet();
+                                newID.setID(value);
+                                IDlist.add(newID);
+                                temp.add(value);}
+                        }
+                    }
+                    affectedEmps.add(e);
+                }
+        return IDlist;
+    }
+    
+    
+    public void calculateTimefromADPSheet() throws IOException, InvalidFormatException{
+        Employees e = new Employees();
+        XSSFWorkbook book = new XSSFWorkbook(ADPfile);
+        XSSFSheet sheet;
+        int rows, col;
+        
+        
+        sheet = book.getSheetAt(0);
+        rows = sheet.getLastRowNum();
+        col = sheet.getRow(0).getLastCellNum();
+        int flag =0;
+                
+        for(int i=1; i <= rows; i++){
+        XSSFRow row = sheet.getRow(i);
+            for(int j=0; j<col; j++){
+            XSSFCell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                if(i>1 && j==4){
+                    int val = (int)cell.getNumericCellValue();
+                    for(int k=0; k < ExcelConversion.empList.size();k++){
+                        if(ExcelConversion.empList.get(k).getIDs()==val){
+                            e = ExcelConversion.empList.get(k);
+                        }
+                    }
+                }if(i>1 && j==5){
+                    String earningsCode = cell.getStringCellValue();
+                    switch(earningsCode){
+                        case "REG":
+                            flag =0;
+                            break;
+                        case "OVT":
+                            flag =1;
+                            break;
+                        case "SYC":
+                            flag =2;
+                            break;
+                    }
+                }if(i>1 && j==6){
+                    double val = cell.getNumericCellValue();
+                    switch(flag){
+                        case 0:
+                            System.out.println(e.getTotalHoursWorked()+" VALUE");
+                            e.setTotalHoursWorked(e.getTotalHoursWorked()+val);
+                            break;
+                        case 1:
+                            e.setOvertime(e.getOvertime()+val);
+                            break;
+                        case 2:
+                            e.setSickTimeAccrued(e.getSickTimeAccrued()+val);
+                            break;
+                    }
+                }
+            }
+        }
+        int i=0;
+        for(Employees emp: empList){
+            emp.calculateSickTime(emp.getTotalHoursWorked());
+        }
+    }
+    
+    public ButtonType alert(){
+        Employees e = (Employees)table.getSelectionModel().getSelectedItem();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Confirm Change to "+e.getName()+"'s ID");
+        alert.showAndWait();
+        return alert.getResult();
     }
 }

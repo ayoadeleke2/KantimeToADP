@@ -16,13 +16,14 @@ import javafx.scene.control.cell.TextFieldTableCell;
  * @author maple
  */
 public class EmployeeTableViewFactory {
-    public static ObservableList<Employees> getColumns(){
+    public static TableColumn<Employees, ?> nameColumn,totalHoursColumn,STColumn,OTColumn,PTOColumn,VTColumn,IDColumn;
+    
+    public static ObservableList<TableColumn> getColumns(){
   
-        ObservableList list = FXCollections.observableArrayList();
+        ObservableList<TableColumn> list = FXCollections.observableArrayList();
         TableColumn<?,?> nameColumn = new TableColumn<>("Employee Name");
             nameColumn.setPrefWidth(150);
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-            //nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             nameColumn.setId("0");
             
             TableColumn<Employees,String> totalHoursColumn = new TableColumn<>("Total Hours");
@@ -51,11 +52,11 @@ public class EmployeeTableViewFactory {
             PTOColumn.setId("4");
             
             TableColumn IDColumn = new TableColumn<>("ID");
-            PTOColumn.setPrefWidth(75);
-            PTOColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
-            PTOColumn.setId("5");
+            //IDColumn.setPrefWidth(75);
+            IDColumn.setCellValueFactory(new PropertyValueFactory<>("IDs"));
+            IDColumn.setId("5");
             
-           list.addAll(nameColumn,totalHoursColumn,STColumn,OTColumn,PTOColumn,VTColumn,IDColumn);
+           list.addAll(IDColumn,nameColumn,totalHoursColumn,STColumn,OTColumn,PTOColumn,VTColumn);
            return list;
     }
 }

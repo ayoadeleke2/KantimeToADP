@@ -5,7 +5,13 @@
  */
 package Data;
 import View.ExcelConversion;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -132,26 +138,4 @@ public class PayrollSheet {
     public void setBatchID(int batchID) {
         this.batchID = batchID;
     }
-    
-    public static ArrayList<Integer> getEmployeeID(XSSFWorkbook book ,XSSFSheet sheet){
-        
-        ArrayList<Integer> list = new ArrayList<>();
-        int rows, col;
-        sheet = book.getSheetAt(0);
-        rows = sheet.getLastRowNum();
-        col = sheet.getRow(0).getLastCellNum();
-        
-        for(int i=1; i <= rows; i++){
-            XSSFRow row = sheet.getRow(i);
-            for(int j=0; j<col; j++){
-                XSSFCell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                    if(i>0 && j==4){
-                        int value = (int)cell.getNumericCellValue();
-                        if(list.contains(value)==false)
-                            list.add(value);
-                    }
-                }
-            }
-        return list;
-        }
 }
