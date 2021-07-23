@@ -5,6 +5,8 @@
  */
 package Controller;
 
+import static Controller.HomeController.primaryStage2;
+import static Controller.HomeController.reviewScene;
 import Data.Employees;
 import Data.PayrollSheet;
 import View.ExcelConversion;
@@ -15,52 +17,39 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.PopupControl;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import static javafx.scene.input.KeyCode.S;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.stage.Popup;
-import javafx.stage.PopupWindow;
 import javafx.util.Duration;
-import javax.management.Notification;
-import static javax.management.Query.value;
 import tray.animations.AnimationType;
 import tray.notification.NotificationType;
 import tray.notification.TrayNotification;
 import Data.EmployeeTableViewFactory;
 import Data.PayrollSheetTableViewFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -81,6 +70,7 @@ public class EmployeeProfilesController implements Initializable {
     ObservableList<PayrollSheet> empTable = FXCollections.observableArrayList();
     ObservableList<Employees> li = FXCollections.observableArrayList();
     TableView table;
+    TableView table2;
     @FXML
     VBox vbox,vbox2;
     @FXML
@@ -93,9 +83,7 @@ public class EmployeeProfilesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        PayrollSheet PS = new PayrollSheet();
-        
-        TableView table2 = new TableView();
+        table2 = new TableView();
         table = new TableView();
         if(ExcelConversion.empList.isEmpty()){
             
@@ -112,68 +100,13 @@ public class EmployeeProfilesController implements Initializable {
         BackgroundFill fills = new BackgroundFill(new Color(0, 0, 0, 0), CornerRadii.EMPTY, Insets.EMPTY);
         Background bg = new Background(fills);
         table.backgroundProperty().setValue(bg);
-            
-        table.setOnMouseClicked((MouseEvent event) -> {
-                            
-                ObservableList<Employees> list = table.getSelectionModel().getSelectedCells();
-                Employees e = new Employees();
-                Employees selecteditem = (Employees)table.getSelectionModel().getSelectedItem();
-                int SelectedItemIndex = table.getSelectionModel().getSelectedIndex();
-                //String index = (Employees)table.getSelectionModel().getTableView().getVisibleLeafIndex(OTColumn);
-                TablePosition tp, tp2;
-                tp = table.getFocusModel().getFocusedCell();
-                tp2 = table2.getFocusModel().getFocusedCell();
-                switch(tp.getColumn()){
-                    case 6:
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(table.getSelectionModel().getSelectedIndex()));
-                        break;
-                    case 1:
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                        break;
-                    case 2:
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                        break;
-                    case 3:
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                        break;
-                    case 4:
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                        break; 
-                    case 5:
-                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                        break;
-                    case 0:
-                        if(alert().equals(ButtonType.OK)){
-                            selecteditem.setIDs(Integer.valueOf(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()).toString()));
-                            e.setEarningsCode(selecteditem.getEarningsCode());
-                            e.setID(selecteditem.getID());
-                            e.setBatchID(selecteditem.getBatchID());
-                            e.setCoCode(selecteditem.getCoCode());
-                            e.setName(selecteditem.getName());
-                            e.setOvertime(selecteditem.getOvertime());
-                            e.setPaidTimeOff(selecteditem.getPaidTimeOff());
-                            e.setSickTimeAccrued(selecteditem.getSickTimeAccrued());
-                            e.setTotalHoursWorked(selecteditem.getTotalHoursWorked());
-                            e.setVacationTime(selecteditem.getVacationTime());
-                            e.setIDs((Integer)table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()));
-                            System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
-                            System.out.println(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()));
-                            ExcelConversion.empList.remove(SelectedItemIndex);
-                            ExcelConversion.empList.add(SelectedItemIndex,e);
-                            table.getItems().remove(SelectedItemIndex);
-                            table.getItems().add(SelectedItemIndex, e);
-                            table.getSelectionModel().clearSelection();
-                            table.getSelectionModel().select(SelectedItemIndex);
-                            updated=true;
-                            break;
-                        }
-                }
-        });
+        assignIdtoEmployee();
+        sameId();
     }
     
     
     public void addNewEmployee(){
-        
+  
         employee =  new Employees();
         double totalHours = (double)employee.timeToDecimal(Double.parseDouble(hours.getText()),Double.parseDouble(mins.getText()));
         employee.setVacationTime(Double.parseDouble(VT.getText()));
@@ -329,7 +262,7 @@ public class EmployeeProfilesController implements Initializable {
     
     
     public void calculateTimefromADPSheet() throws IOException, InvalidFormatException{
-        Employees e = new Employees();
+        //Employees e = new Employees();
         XSSFWorkbook book = new XSSFWorkbook(ADPfile);
         XSSFSheet sheet;
         int rows, col;
@@ -341,6 +274,7 @@ public class EmployeeProfilesController implements Initializable {
         int flag =0;
                 
         for(int i=1; i <= rows; i++){
+        Employees e = new Employees();
         XSSFRow row = sheet.getRow(i);
             for(int j=0; j<col; j++){
             XSSFCell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
@@ -349,7 +283,7 @@ public class EmployeeProfilesController implements Initializable {
                     for(int k=0; k < ExcelConversion.empList.size();k++){
                         if(ExcelConversion.empList.get(k).getIDs()==val){
                             e = ExcelConversion.empList.get(k);
-                        }
+                           }
                     }
                 }if(i>1 && j==5){
                     String earningsCode = cell.getStringCellValue();
@@ -368,7 +302,8 @@ public class EmployeeProfilesController implements Initializable {
                     double val = cell.getNumericCellValue();
                     switch(flag){
                         case 0:
-                            System.out.println(e.getTotalHoursWorked()+" VALUE");
+                            //System.out.println(e.getTotalHoursWorked()+" VALUE");
+                            System.out.println(e.getName()+" VALUE");
                             e.setTotalHoursWorked(e.getTotalHoursWorked()+val);
                             break;
                         case 1:
@@ -383,14 +318,118 @@ public class EmployeeProfilesController implements Initializable {
         }
         int i=0;
         for(Employees emp: empList){
-            emp.calculateSickTime(emp.getTotalHoursWorked());
+            for(PayrollSheet n:IDlist){
+                if(emp.getIDs()==n.getID())
+                    emp.calculateSickTime(emp.getTotalHoursWorked());
+            }
         }
     }
     
-    public ButtonType alert(){
-        Employees e = (Employees)table.getSelectionModel().getSelectedItem();
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Confirm Change to "+e.getName()+"'s ID");
+    public void assignIdtoEmployee(){
+        String err = "ID already exsists for another employee";
+        table.setOnMouseClicked((MouseEvent event) -> {
+                ObservableList<Employees> list = table.getSelectionModel().getSelectedCells();
+                Employees e = new Employees();
+                int SelectedItemIndex = table.getSelectionModel().getSelectedIndex();
+                //String index = (Employees)table.getSelectionModel().getTableView().getVisibleLeafIndex(OTColumn);
+                TablePosition tp, tp2;
+                tp = table.getFocusModel().getFocusedCell();
+                tp2 = table2.getFocusModel().getFocusedCell();
+                switch(tp.getColumn()){
+                    case 6:
+                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(table.getSelectionModel().getSelectedIndex()));
+                        break;
+                    case 1:
+                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                        break;
+                    case 2:
+                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                        break;
+                    case 3:
+                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                        break;
+                    case 4:
+                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                        break; 
+                    case 5:
+                        System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                        break;
+                    case 0:
+                        boolean error=false;
+                        for(Employees employee: empList){
+                            if(employee.getIDs()==Integer.valueOf(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()).toString())){
+                                error=true;
+                                System.out.println(employee.getIDs()+" Employee IDs");}
+                        }
+                            if(error==false){
+                                //newwindow();
+                                Employees selecteditem = (Employees)table.getSelectionModel().getSelectedItem();
+                                String confirmedChange = "Confirm Change to "+selecteditem.getName()+"'s ID";
+                                if(alert(Alert.AlertType.CONFIRMATION,confirmedChange).equals(ButtonType.OK)){
+                                    selecteditem.setIDs(Integer.valueOf(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()).toString()));
+                                    e.setEarningsCode(selecteditem.getEarningsCode());
+                                    e.setID(selecteditem.getID());
+                                    e.setBatchID(selecteditem.getBatchID());
+                                    e.setCoCode(selecteditem.getCoCode());
+                                    e.setName(selecteditem.getName());
+                                    e.setOvertime(selecteditem.getOvertime());
+                                    e.setPaidTimeOff(selecteditem.getPaidTimeOff());
+                                    e.setSickTimeAccrued(selecteditem.getSickTimeAccrued());
+                                    e.setTotalHoursWorked(selecteditem.getTotalHoursWorked());
+                                    e.setVacationTime(selecteditem.getVacationTime());
+                                    e.setIDs((Integer)table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()));
+                                    System.out.println(table.getSelectionModel().getTableView().getVisibleLeafColumn(tp.getColumn()).getCellData(tp.getRow()));
+                                    System.out.println(table2.getSelectionModel().getTableView().getVisibleLeafColumn(0).getCellData(tp2.getRow()));
+                                    ExcelConversion.empList.remove(SelectedItemIndex);
+                                    ExcelConversion.empList.add(SelectedItemIndex,e);
+                                    table.getItems().remove(SelectedItemIndex);
+                                    table.getItems().add(SelectedItemIndex, e);
+                                    table.getSelectionModel().clearSelection();
+                                    table.getSelectionModel().select(SelectedItemIndex);
+                                    updated=true;
+                                    break;
+                                }
+                            }else 
+                                alert(AlertType.ERROR,err);
+                }
+        });
+    }
+    
+    public void sameId(){
+        
+        ObservableList list = table2.getSelectionModel().getSelectedItems();
+        table2.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        table2.setOnMouseClicked((MouseEvent e )->{
+            if(list.size() == 1)
+                table.getSelectionModel().clearSelection();
+                TablePosition tp = table2.getFocusModel().getFocusedCell();
+                int cellValue = (int)table2.getVisibleLeafColumn(0).getCellData(tp.getRow());
+                for(Employees emp: empList){
+                    if(emp.getIDs()==cellValue)
+                        table.getSelectionModel().select(emp);
+                
+            }
+        });
+    }
+    
+    public void newwindow(){
+        
+        try {
+            primaryStage2= new Stage();
+            Parent mainMenuFXML;
+            mainMenuFXML = FXMLLoader.load(getClass().getResource("/View/reviewEmployee.fxml"));
+            reviewScene = new Scene(mainMenuFXML);
+            primaryStage2.setScene(reviewScene);
+            primaryStage2.setTitle("Batch #"+ExcelConversion.empSheetList.get(ExcelConversion.empSheetList.size()-1).getBatchID());
+            primaryStage2.show();
+        } catch (IOException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }            
+    }
+    
+    public ButtonType alert(AlertType type, String message){
+        Alert alert = new Alert(type);
+        alert.setContentText(message);
         alert.showAndWait();
         return alert.getResult();
     }
