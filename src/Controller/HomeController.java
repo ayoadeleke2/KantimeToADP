@@ -151,7 +151,7 @@ public class HomeController implements Initializable {
                                 break;    
                             case 4: newCell.setCellValue((Integer)ExcelConversion.empSheetList.get(row-requiredInfo.length).getID());
                                 break;
-                            case 5: if(ExcelConversion.empSheetList.get(row-requiredInfo.length).getPayRate()==Double.valueOf(sickTime.getText())){
+                            case 5: if(ExcelConversion.empSheetList.get(row-requiredInfo.length).getPayRate()==Double.valueOf(1)){
                                         newCell.setCellValue((String)"SPY");
                                         ExcelConversion.empSheetList.get(row-requiredInfo.length).setEarningsCode("SPY");
                             /*          ExcelConversion.empList.get(row-2).getRegHours()/*
@@ -197,7 +197,6 @@ public class HomeController implements Initializable {
     
     public void newWindow(){
         
-
         try {
             primaryStage2= new Stage();
             System.out.println("counting");

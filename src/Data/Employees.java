@@ -5,6 +5,8 @@
  */
 package Data;
 
+import java.text.DecimalFormat;
+
 /**
  *
  * @author maple
@@ -114,6 +116,8 @@ public class Employees extends PayrollSheet{
      * @param sickTimeAccrued the sickTimeAccrued to set
      */
     public void setSickTimeAccrued(double sickTimeAccrued) {
+        //DecimalFormat format = new DecimalFormat("##.##");
+        //this.sickTimeAccrued = Integer.valueOf(format.format(sickTimeAccrued));
         this.sickTimeAccrued = sickTimeAccrued;
     }
     
